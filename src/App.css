@@ -162,6 +162,22 @@ footer {
   color: #657084;
 }
 
+.state button {
+  margin-top: 16px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #c62828;
+  color: #ffffff;
+  font: inherit;
+  cursor: pointer;
+}
+
+.state button:focus {
+  outline: 2px solid #172033;
+  outline-offset: 2px;
+}
+
 /* Mobile */
 
 @media (max-width: 700px) {
