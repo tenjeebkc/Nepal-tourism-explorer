@@ -7,6 +7,9 @@ The application turns published Nepal Tourism Board tourism statistics into a si
 * How have international visitor arrivals to Nepal changed over time?
 * Which countries were the main source markets for visitors in 2025?
 
+# Live Demo
+https://nepal-tourism-explorer-khaki.vercel.app/
+
 # Features
 
 * Annual international visitor arrivals from 2019–2025
