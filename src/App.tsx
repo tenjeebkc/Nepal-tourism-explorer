@@ -15,14 +15,31 @@ import "./App.css";
 
 function App() {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [year, setYear] = useState(2025);
 
-  useEffect(() => {
+  const loadData = () => {
+    setLoading(true);
+    setError(false);
+
     const timer = setTimeout(() => {
-      setLoading(false);
+      try {
+        if (!annualArrivals.length || !sourceMarkets[2025]?.length) {
+          throw new Error("Tourism data is unavailable.");
+        }
+
+        setLoading(false);
+      } catch {
+        setError(true);
+        setLoading(false);
+      }
     }, 500);
 
     return () => clearTimeout(timer);
+  };
+
+  useEffect(() => {
+    return loadData();
   }, []);
 
   if (loading) {
@@ -33,7 +50,34 @@ function App() {
     );
   }
 
-  const recovery = (1158459 / 1197191) * 100;
+  if (error) {
+    return (
+      <main className="state">
+        <div>
+          <h1>Unable to load data</h1>
+          <p>Please try again.</p>
+          <button onClick={loadData}>Retry</button>
+        </div>
+      </main>
+    );
+  }
+
+  const arrivals2025 =
+    annualArrivals.find((item) => item.year === 2025)?.arrivals ?? 0;
+
+  const arrivals2024 =
+    annualArrivals.find((item) => item.year === 2024)?.arrivals ?? 0;
+
+  const arrivals2019 =
+    annualArrivals.find((item) => item.year === 2019)?.arrivals ?? 0;
+
+  const growth =
+    ((arrivals2025 - arrivals2024) / arrivals2024) * 100;
+
+  const recovery = (arrivals2025 / arrivals2019) * 100;
+
+  const selectedMarkets =
+    sourceMarkets[year as keyof typeof sourceMarkets] ?? [];
 
   return (
     <main className="container">
@@ -51,12 +95,15 @@ function App() {
       <section className="summary-grid">
         <article className="card">
           <span>2025 arrivals</span>
-          <strong>1.16M</strong>
+          <strong>{(arrivals2025 / 1000000).toFixed(2)}M</strong>
         </article>
 
         <article className="card">
           <span>2025 vs 2024</span>
-          <strong>+0.95%</strong>
+          <strong>
+            {growth >= 0 ? "+" : ""}
+            {growth.toFixed(2)}%
+          </strong>
         </article>
 
         <article className="card">
@@ -71,7 +118,8 @@ function App() {
             <h2>Visitor arrivals over time</h2>
 
             <p>
-              How international arrivals to Nepal have changed since 2019.
+              How international arrivals to Nepal have changed since
+              2019.
             </p>
           </div>
         </div>
@@ -80,11 +128,8 @@ function App() {
           <ResponsiveContainer width="100%" height={320}>
             <LineChart data={annualArrivals}>
               <XAxis dataKey="year" />
-
               <YAxis />
-
               <Tooltip />
-
               <Line
                 type="monotone"
                 dataKey="arrivals"
@@ -108,31 +153,33 @@ function App() {
           <select
             value={year}
             onChange={(event) => setYear(Number(event.target.value))}
+            aria-label="Select year"
           >
             <option value={2025}>2025</option>
           </select>
         </div>
 
         <div className="chart-card">
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart
-              data={sourceMarkets[year as keyof typeof sourceMarkets]}
-              layout="vertical"
-              margin={{ left: 40 }}
-            >
-              <XAxis type="number" />
-
-              <YAxis
-                dataKey="country"
-                type="category"
-                width={120}
-              />
-
-              <Tooltip />
-
-              <Bar dataKey="arrivals" />
-            </BarChart>
-          </ResponsiveContainer>
+          {selectedMarkets.length > 0 ? (
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart
+                data={selectedMarkets}
+                layout="vertical"
+                margin={{ left: 40 }}
+              >
+                <XAxis type="number" />
+                <YAxis
+                  dataKey="country"
+                  type="category"
+                  width={120}
+                />
+                <Tooltip />
+                <Bar dataKey="arrivals" />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <p>No source market data is available for this year.</p>
+          )}
         </div>
       </section>
 
