@@ -8,6 +8,7 @@ The application turns published Nepal Tourism Board tourism statistics into a si
 * Which countries were the main source markets for visitors in 2025?
 
 ## Live Demo
+
 https://nepal-tourism-explorer-khaki.vercel.app/
 
 # Features
