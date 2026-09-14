@@ -1,122 +1,154 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
+
+import { annualArrivals, sourceMarkets } from "./data/tourismData";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [loading, setLoading] = useState(true);
+  const [year, setYear] = useState(2025);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="state">
+        <p>Loading tourism data...</p>
+      </main>
+    );
+  }
+
+  const currentArrivals =
+    annualArrivals.find((item) => item.year === year)?.arrivals ?? 0;
+
+  const previousArrivals =
+    annualArrivals.find((item) => item.year === year - 1)?.arrivals ?? 0;
+
+  const growth =
+    previousArrivals > 0
+      ? ((currentArrivals - previousArrivals) / previousArrivals) * 100
+      : 0;
+
+  const recovery =
+    ((currentArrivals / 1197191) * 100);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+    <main className="container">
+      <header>
+        <p className="eyebrow">NEPAL TOURISM</p>
+        <h1>Nepal Tourism Explorer</h1>
+        <p className="intro">
+          Explore international visitor arrivals to Nepal and see
+          where visitors come from.
+        </p>
+      </header>
+
+      <section className="summary-grid">
+        <article className="card">
+          <span>2025 arrivals</span>
+          <strong>1.16M</strong>
+        </article>
+
+        <article className="card">
+          <span>2025 vs 2024</span>
+          <strong>+0.95%</strong>
+        </article>
+
+        <article className="card">
+          <span>2025 vs 2019</span>
+          <strong>{recovery.toFixed(1)}%</strong>
+        </article>
       </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      <section className="section">
+        <div className="section-heading">
+          <div>
+            <h2>Visitor arrivals over time</h2>
+            <p>How international arrivals to Nepal have changed since 2019.</p>
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+
+        <div className="chart-card">
+          <ResponsiveContainer width="100%" height={320}>
+            <LineChart data={annualArrivals}>
+              <XAxis dataKey="year" />
+              <YAxis />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="arrivals"
+                strokeWidth={2}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+      <section className="section">
+        <div className="section-heading">
+          <div>
+            <h2>Where visitors come from</h2>
+            <p>Top source markets for the selected year.</p>
+          </div>
+
+          <select
+            value={year}
+            onChange={(e) => setYear(Number(e.target.value))}
+          >
+            <option value={2025}>2025</option>
+          </select>
+        </div>
+
+        <div className="chart-card">
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart
+              data={sourceMarkets[year as keyof typeof sourceMarkets]}
+              layout="vertical"
+              margin={{ left: 40 }}
+            >
+              <XAxis type="number" />
+              <YAxis
+                dataKey="country"
+                type="category"
+                width={120}
+              />
+              <Tooltip />
+              <Bar dataKey="arrivals" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </section>
+
+      <section className="limitations">
+        <h2>About the data</h2>
+        <p>
+          The figures represent international visitor arrivals published
+          by the Nepal Tourism Board. Arrival counts do not measure tourism
+          revenue, visitor spending, length of stay, satisfaction, or
+          overall economic impact.
+        </p>
+      </section>
+
+      <footer>
+        Data source: Nepal Tourism Board
+      </footer>
+    </main>
+  );
 }
 
-export default App
+export default App;
