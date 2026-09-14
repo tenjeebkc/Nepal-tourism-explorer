@@ -33,25 +33,15 @@ function App() {
     );
   }
 
-  const currentArrivals =
-    annualArrivals.find((item) => item.year === year)?.arrivals ?? 0;
-
-  const previousArrivals =
-    annualArrivals.find((item) => item.year === year - 1)?.arrivals ?? 0;
-
-  const growth =
-    previousArrivals > 0
-      ? ((currentArrivals - previousArrivals) / previousArrivals) * 100
-      : 0;
-
-  const recovery =
-    ((currentArrivals / 1197191) * 100);
+  const recovery = (1158459 / 1197191) * 100;
 
   return (
     <main className="container">
       <header>
         <p className="eyebrow">NEPAL TOURISM</p>
+
         <h1>Nepal Tourism Explorer</h1>
+
         <p className="intro">
           Explore international visitor arrivals to Nepal and see
           where visitors come from.
@@ -79,7 +69,10 @@ function App() {
         <div className="section-heading">
           <div>
             <h2>Visitor arrivals over time</h2>
-            <p>How international arrivals to Nepal have changed since 2019.</p>
+
+            <p>
+              How international arrivals to Nepal have changed since 2019.
+            </p>
           </div>
         </div>
 
@@ -87,8 +80,11 @@ function App() {
           <ResponsiveContainer width="100%" height={320}>
             <LineChart data={annualArrivals}>
               <XAxis dataKey="year" />
+
               <YAxis />
+
               <Tooltip />
+
               <Line
                 type="monotone"
                 dataKey="arrivals"
@@ -103,12 +99,15 @@ function App() {
         <div className="section-heading">
           <div>
             <h2>Where visitors come from</h2>
-            <p>Top source markets for the selected year.</p>
+
+            <p>
+              Top source markets for the selected year.
+            </p>
           </div>
 
           <select
             value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
+            onChange={(event) => setYear(Number(event.target.value))}
           >
             <option value={2025}>2025</option>
           </select>
@@ -122,12 +121,15 @@ function App() {
               margin={{ left: 40 }}
             >
               <XAxis type="number" />
+
               <YAxis
                 dataKey="country"
                 type="category"
                 width={120}
               />
+
               <Tooltip />
+
               <Bar dataKey="arrivals" />
             </BarChart>
           </ResponsiveContainer>
@@ -136,11 +138,12 @@ function App() {
 
       <section className="limitations">
         <h2>About the data</h2>
+
         <p>
-          The figures represent international visitor arrivals published
-          by the Nepal Tourism Board. Arrival counts do not measure tourism
-          revenue, visitor spending, length of stay, satisfaction, or
-          overall economic impact.
+          The figures represent international visitor arrivals
+          published by the Nepal Tourism Board. Arrival counts do not
+          measure tourism revenue, visitor spending, length of stay,
+          visitor satisfaction, or overall economic impact.
         </p>
       </section>
 
